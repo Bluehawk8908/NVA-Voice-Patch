@@ -4,4 +4,4 @@ This mod firstly forces the commander to designate the desired ammunition instea
 **Installation**  
 This mod requires MelonLoader and is intended to be used with Version 0.6.1! This mod does NOT require the Vehicle Preloader.  
 
-To install, simply extract the "SovietGuards.dll" file into your /mods/ folder.
+To install, simply extract the "NVA_Voices.dll" file into your /mods/ folder.

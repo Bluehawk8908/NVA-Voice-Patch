@@ -1,4 +1,4 @@
-# NVA-Voice-Patch
+# NVA Voice Patch
 This mod firstly forces the commander to designate the desired ammunition instead of whatever is currently loaded, when using "manual" or "doctrinal" loading, for both Soviet and East German crews. Secondly, the mod moves the "Schuß" voice line spoken by East-German tank commanders to the gunner, which was the callout the gunner made when firing (subtitled as "on the way!") and not a command to fire. The associated subtitles are modified to correspond logically. Bundeswehr gunners still call out "achtung" when firing.
 
 **Installation**  

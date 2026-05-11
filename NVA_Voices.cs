@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Localization.Settings;
 
-[assembly: MelonInfo(typeof(NVAVoiceClass), "DDR NVA Voice Patch", "1.0.0", "Bluehawk")]
+[assembly: MelonInfo(typeof(NVAVoiceClass), "DDR NVA Voice Patch", "1.0.1", "Bluehawk")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace NVA_Voices
@@ -27,6 +27,23 @@ namespace NVA_Voices
     {
         public static MelonPreferences_Entry<bool> mute_logger;
 
+        static string[] ChrisAchtungCombat = { "de84_G_ontheway_ChristianPiontek_combat_01",
+                                               "de84_G_ontheway_ChristianPiontek_combat_02",
+                                               "de84_G_ontheway_ChristianPiontek_combat_03",
+                                               "de84_G_ontheway_ChristianPiontek_combat_04"};
+        static string[] ChrisAchtungPanic = { "de84_G_ontheway_ChristianPiontek_panic_01",
+                                              "de84_G_ontheway_ChristianPiontek_panic_02",
+                                              "de84_G_ontheway_ChristianPiontek_panic_03",
+                                              "de84_G_ontheway_ChristianPiontek_panic_04"};
+        static string[] LeonAchtungCombat = { "de84_G_ontheway_LeonBeilmann_combat_01",
+                                              "de84_G_ontheway_LeonBeilmann_combat_02",
+                                              "de84_G_ontheway_LeonBeilmann_combat_03",
+                                              "de84_G_ontheway_LeonBeilmann_combat_04",};
+        static string[] LeonAchtungPanic = { "de84_G_ontheway_LeonBeilmann_panic_01",
+                                             "de84_G_ontheway_LeonBeilmann_panic_02",
+                                             "de84_G_ontheway_LeonBeilmann_panic_03",
+                                             "de84_G_ontheway_LeonBeilmann_panic_04",};
+        
         static string[] ChrisSchussCombat = {"de84_TC_fire_ChristianPiontek_combat_05",
                                               "de84_TC_fire_ChristianPiontek_combat_06",
                                               "de84_TC_fire_ChristianPiontek_combat_07",
@@ -166,8 +183,7 @@ namespace NVA_Voices
                         }
                     }
                 }
-
-                if (!playerNVA) continue;
+                                
                 ActorVoiceSetsScriptable gunnerAVSS = DictCrewActors[CrewPosition.Gunner];
                 String gunnerActor = gunnerAVSS.ActorName;
                 List<VoiceSubset> gunnerList = gunnerAVSS.AllVoiceSubsets;
@@ -176,20 +192,28 @@ namespace NVA_Voices
                     if (voice.Name == "DE 84 Gunner/Loader")
                     {
                         VoiceSubset.VoiceLineDictionary gunnerVoxDict = voice.AllVoiceLines;
-                        VoiceLine onTheWay;
+                        VoiceLine onTheWay;                        
                         if (gunnerVoxDict.TryGetValue("ontheway", out onTheWay))
                         {
-                            if (gunnerActor == "Christian Piontek")
+                            //changes are persistent across scenes, so we need to reset the defaults for the Bundeswehr
+                            if (!playerNVA) { 
+                                if (gunnerActor == "Christian Piontek") {
+                                    onTheWay.CombatClipKeys = ChrisAchtungCombat;
+                                    onTheWay.PanickedClipKeys = ChrisAchtungPanic;} 
+                                else {
+                                    onTheWay.CombatClipKeys = LeonAchtungCombat;
+                                    onTheWay.PanickedClipKeys = LeonAchtungPanic;}
+                                if (!mute_logger.Value) { MelonLogger.Msg("Gunner's 'achtung' affirmed"); }
+                            } else
                             {
-                                onTheWay.CombatClipKeys = ChrisSchussCombat;
-                                onTheWay.PanickedClipKeys = ChrisSchussPanic;
-                            }
-                            else
-                            {
-                                onTheWay.CombatClipKeys = LeonSchussCombat;
-                                onTheWay.PanickedClipKeys = LeonSchussPanic;
-                            }
-                            if (!mute_logger.Value) { MelonLogger.Msg("Gunner's 'achtung' replaced with 'Schuss'"); }
+                                if (gunnerActor == "Christian Piontek") {
+                                    onTheWay.CombatClipKeys = ChrisSchussCombat;
+                                    onTheWay.PanickedClipKeys = ChrisSchussPanic;}
+                                else {
+                                    onTheWay.CombatClipKeys = LeonSchussCombat;
+                                    onTheWay.PanickedClipKeys = LeonSchussPanic;}
+                                if (!mute_logger.Value) { MelonLogger.Msg("Gunner's 'achtung' replaced with 'Schuss'"); }
+                            }                            
 
                             var table = LocalizationSettings.StringDatabase.GetTable("VoiceLocalizationTable");
                             for (int i = 0; i < 4; i++)

@@ -2,6 +2,7 @@ using GHPC.Crew;
 using GHPC.Effects.Voices;
 using GHPC.State;
 using GHPC.Vehicle;
+using GHPC.Mission;
 using GHPC.Player;
 using MelonLoader;
 using NVA_Voices;
@@ -11,7 +12,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Localization.Settings;
 
-[assembly: MelonInfo(typeof(NVAVoiceClass), "DDR NVA Voice Patch", "1.0.1", "Bluehawk")]
+[assembly: MelonInfo(typeof(NVAVoiceClass), "DDR NVA Voice Patch", "1.0.2", "Bluehawk")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace NVA_Voices
@@ -96,7 +97,7 @@ namespace NVA_Voices
             gameManager = GameObject.Find("_APP_GHPC_");
             if (gameManager == null) return;
             
-            StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(VoicePatch), GameStatePriority.Lowest);            
+            StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(VoicePatch), GameStatePriority.Lowest);             
         }
 
         public IEnumerator VoicePatch(GameState _)
@@ -108,7 +109,7 @@ namespace NVA_Voices
             //We must also make the changes in a loop of vehicles, since the player can start in an NVA "vehicle" with no voice, like the SPG-9 launcher.            
             PlayerInput pi = gameManager.gameObject.GetComponent<PlayerInput>();
             Vehicle playerStart = (Vehicle)pi.CurrentPlayerUnit;
-            if (playerStart == null) { MelonLogger.Error("Too soon to assign a unit to the player"); }
+            if (playerStart == null) { MelonLogger.Error("Too soon to assign a unit to the player"); }            
             bool playerNVA;
             switch (playerStart.UniqueName) //is there no better way to determine if a vehicle with German voices is NVA or Bundeswehr?
             {
@@ -141,13 +142,19 @@ namespace NVA_Voices
                     break;
             }
 
-            Vehicle[] vicArray = GameObject.FindObjectsByType<Vehicle>(FindObjectsSortMode.None);
+            //Vehicle[] vicArray = GameObject.FindObjectsByType<Vehicle>(FindObjectsSortMode.None);
+            List<GHPC.Unit> vehicles = new List<GHPC.Unit>();
+            VehicleSpawnPoint[] spawnArray = GameObject.FindObjectsByType<VehicleSpawnPoint>(FindObjectsSortMode.None);
+            foreach (var spawn in spawnArray) 
+            { 
+                vehicles.AddRange(spawn.SpawnedUnits);
+            }
             
-            foreach (var vic in vicArray)
-            {
-                if (vic.CrewVoiceHandler == null) continue; 
+            foreach (var vic in vehicles)
+            {                
+                if (vic.CrewVoiceHandler == null) { continue; } 
                 CrewVoiceHandler cvh = vic.CrewVoiceHandler;
-                if (cvh.VoiceProtocolLineData.name == "US_84_VoiceProtocol") continue;
+                if (cvh.VoiceProtocolLineData.name == "US_84_VoiceProtocol") { continue; }
                 bool isRUS = false;
                 if (cvh.VoiceProtocolLineData.name == "USSR_84_VoiceProtocol") isRUS = true;
                 cvh._ammoCallout = CrewVoiceHandler.AmmoCallout.DesiredAmmo;
@@ -231,8 +238,9 @@ namespace NVA_Voices
                     }
                 }
             }
-            activeScene = false;
-            yield break;
+            
+        activeScene = false;
+        yield break;            
         }
     }
 }
